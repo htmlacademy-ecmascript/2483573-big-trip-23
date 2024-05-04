@@ -42,12 +42,12 @@ export default class Presenter {
     this.renderEditView();
     this.renderCreateView();
 
-    for (let i = 0; i < 3; i++) {
-      points.renderItemView();
-      destinations.renderItemView();
-    }
+    // for (let i = 0; i < 3; i++) {
+    //   points.renderItemView();
+    //   destinations.renderItemView();
+    // }
 
-    render(this.ListView, this.container);
+    render(this.ListView, this.container,this.points,this.destinations);
   }
 }
 
