@@ -72,7 +72,7 @@ export default class ItemView {
   }
 
   getTemplate() {
-    return createItemView();
+    return createItemView(this.point);
   }
 
   getElement() {

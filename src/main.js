@@ -4,7 +4,7 @@ import Presenter from './presenter/view-presenter';
 import PointsModel from './model/point-model';
 const tripFilters = document.querySelector('.trip-controls__filters');
 const tripEvents = document.querySelector('.trip-events');
-const pointModel = new PointsModel;
+const pointModel = new PointsModel();
 const tripPresenter = new Presenter({
   container: tripEvents,pointModel
 });
@@ -12,4 +12,4 @@ const tripPresenter = new Presenter({
 render(new ListFilterView(), tripFilters);
 
 tripPresenter.init();
-pointModel.init();
+
