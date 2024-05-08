@@ -1,12 +1,14 @@
 import { render } from '../render';
+import { points } from '../mock/point-mock';
 import EditPointView from '../view/edit-point-view';
 import SortView from '../view/list-sort-view';
 import ItemView from '../view/item-view';
 import ListView from '../view/list-view';
 import CreateView from '../view/create-view';
 export default class Presenter {
-  constructor({ container }) {
+  constructor({ container,pointModel }) {
     this.container = container;
+    this.pointModel = pointModel;
   }
 
   renderSortView() {
@@ -29,25 +31,24 @@ export default class Presenter {
     render(this.CreateView, this.ListView.getElement());
   }
 
-  renderItemView() {
-    this.ItemView = new ItemView();
+  renderItemView(PointsModel,destination) {
+    this.ItemView = new ItemView(PointsModel,destination);
     render(this.ItemView, this.ListView.getElement());
   }
 
   init() {
-    const points = this.pointModel.getPoints();
-    const destinations = this.destinationModel.getDestination();
+    this.pointContainer = [...this.pointModel.getPoints()];
+    this.destinationContainer = [...this.pointModel.getDestination()];
     this.renderSortView();
     this.renderListView();
     this.renderEditView();
     this.renderCreateView();
 
-    // for (let i = 0; i < 3; i++) {
-    //   points.renderItemView();
-    //   destinations.renderItemView();
-    // }
+    points.forEach((pointsModels, destination) => {
+      this.renderItemView(pointsModels, destination);
+    });
 
-    render(this.ListView, this.container,this.points,this.destinations);
+    render(this.ListView, this.container);
   }
 }
 

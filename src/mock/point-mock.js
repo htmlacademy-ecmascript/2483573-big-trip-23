@@ -35,6 +35,6 @@ export const points = [
 
 ];
 
-export function getRandomPoints(){
+export function getRandomPoint(){
   return getRandomArrayElement(points);
 }
