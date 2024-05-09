@@ -1,7 +1,23 @@
 import {createElement} from '../render';
 
-function createItemView(point) {
-  const {type,isFavorite} = point;
+function createOfferItem(offer) {
+  return (
+    `
+			<li class="event__offer">
+				<span class="event__offer-title">${offer.title}</span>
+				&plus;&euro;&nbsp;
+				<span class="event__offer-price">${offer.price}</span>
+			</li>
+		`
+  );
+}
+
+function createItemView(point, offers) {
+  const { type, isFavorite,basePrice} = point;
+
+  const pointOffer = offers.find((offer) => offer.type === point.type);
+  const currentOffers = point.offers.map((offerID) => pointOffer.offers.find((offer) => offer.id === offerID));
+
   return (
     `<li class="trip-events__item">
 	<div class="event">
@@ -29,22 +45,15 @@ function createItemView(point) {
 			<p class="event__duration">01H 10M</p>
 		</div>
 		<p class="event__price">
-			&euro;&nbsp;<span class="event__price-value">160</span>
+			&euro;&nbsp;<span class="event__price-value">${basePrice}</span>
 		</p>
 		<h4 class="visually-hidden">Offers:</h4>
+
 		<ul class="event__selected-offers">
-			<li class="event__offer">
-				<span class="event__offer-title">Add luggage</span>
-				&plus;&euro;&nbsp;
-				<span class="event__offer-price">50</span>
-			</li>
-			<li class="event__offer">
-				<span class="event__offer-title">Switch to comfort</span>
-				&plus;&euro;&nbsp;
-				<span class="event__offer-price">80</span>
-			</li>
+			${ currentOffers.map((offer) => createOfferItem(offer)).join('') }
 		</ul>
-		<button class="event__favorite-btn${isFavorite ? 'event__favorite-btn--active' : ''}" type="button">
+
+		<button class="event__favorite-btn ${isFavorite ? 'event__favorite-btn--active' : ''}" type="button">
 			<span class="visually-hidden">Add to favorite</span>
 			<svg
 				class="event__favorite-icon"
@@ -66,13 +75,14 @@ function createItemView(point) {
 }
 
 export default class ItemView {
-  constructor(point,destination){
+  constructor(point, destination, offers){
     this.point = point;
     this.destination = destination;
+    this.offers = offers;
   }
 
   getTemplate() {
-    return createItemView(this.point);
+    return createItemView(this.point, this.offers);
   }
 
   getElement() {

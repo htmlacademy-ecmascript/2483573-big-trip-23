@@ -1,12 +1,14 @@
 import { render } from '../render';
-import { points } from '../mock/point-mock';
+import { getRandomArrayElement } from '../util';
+
 import EditPointView from '../view/edit-point-view';
 import SortView from '../view/list-sort-view';
 import ItemView from '../view/item-view';
 import ListView from '../view/list-view';
 import CreateView from '../view/create-view';
+
 export default class Presenter {
-  constructor({ container,pointModel }) {
+  constructor({ container, pointModel }) {
     this.container = container;
     this.pointModel = pointModel;
   }
@@ -21,8 +23,8 @@ export default class Presenter {
     render(this.ListView, this.container);
   }
 
-  renderEditView() {
-    this.EditView = new EditPointView();
+  renderEditView(point, destinations, offers) {
+    this.EditView = new EditPointView(point, destinations, offers);
     render(this.EditView, this.ListView.getElement());
   }
 
@@ -31,21 +33,31 @@ export default class Presenter {
     render(this.CreateView, this.ListView.getElement());
   }
 
-  renderItemView(PointsModel,destination) {
-    this.ItemView = new ItemView(PointsModel,destination);
+  renderItemView(points, destination, offers) {
+    this.ItemView = new ItemView(points, destination, offers);
     render(this.ItemView, this.ListView.getElement());
   }
 
   init() {
-    this.pointContainer = [...this.pointModel.getPoints()];
-    this.destinationContainer = [...this.pointModel.getDestination()];
+    const points = this.pointModel.getPoints();
+    const destinations = this.pointModel.getDestinations();
+    const offers = this.pointModel.getOffers();
+
+    const destination = this.pointModel.getDestinations();
+    const randomPoint = getRandomArrayElement(points);
+    const emptyPoint = this.pointModel.getEmptyPoint();
+
     this.renderSortView();
     this.renderListView();
-    this.renderEditView();
-    this.renderCreateView();
+    this.renderEditView(randomPoint, destinations, offers);
+    this.renderEditView(emptyPoint, destinations, offers);
+    // this.renderCreateView();
 
-    points.forEach((pointsModels, destination) => {
-      this.renderItemView(pointsModels, destination);
+
+    this.pointModel.getPoints().forEach((point) => {
+
+
+      this.renderItemView(point, destination, offers);
     });
 
     render(this.ListView, this.container);
