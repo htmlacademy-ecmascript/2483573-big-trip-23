@@ -5,7 +5,7 @@ import { getOffer } from '../mock/offers-mock';
 
 const POINTS_COUNT = 5;
 
-export default class PointsModel {
+export default class TripModel {
   points = Array.from({length: POINTS_COUNT}, getRandomPoint);
   destinations = getDestination;
   offers = getOffer;
