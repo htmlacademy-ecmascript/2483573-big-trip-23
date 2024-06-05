@@ -8,9 +8,9 @@ import ListView from '../view/list-view';
 import CreateView from '../view/create-view';
 
 export default class Presenter {
-  constructor({ container, pointModel }) {
+  constructor({ container, tripModel }) {
     this.container = container;
-    this.pointModel = pointModel;
+    this.tripModel = tripModel;
   }
 
   renderSortView() {
@@ -39,13 +39,13 @@ export default class Presenter {
   }
 
   init() {
-    const points = this.pointModel.getPoints();
-    const destinations = this.pointModel.getDestinations();
-    const offers = this.pointModel.getOffers();
+    const points = this.tripModel.getPoints();
+    const destinations = this.tripModel.getDestinations();
+    const offers = this.tripModel.getOffers();
 
-    const destination = this.pointModel.getDestinations();
+    const destination = this.tripModel.getDestinations();
     const randomPoint = getRandomArrayElement(points);
-    const emptyPoint = this.pointModel.getEmptyPoint();
+    const emptyPoint = this.tripModel.getEmptyPoint();
 
     this.renderSortView();
     this.renderListView();
@@ -54,7 +54,7 @@ export default class Presenter {
     // this.renderCreateView();
 
 
-    this.pointModel.getPoints().forEach((point) => {
+    this.tripModel.getPoints().forEach((point) => {
 
 
       this.renderItemView(point, destination, offers);
