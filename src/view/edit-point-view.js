@@ -1,4 +1,4 @@
-import {AbstractView} from '../framework/view/abstract-view';
+import AbstractView from '../framework/view/abstract-view';
 
 function createEventTypeItem(offer, selectedOffer) {
   const isChecked = offer.type === selectedOffer;

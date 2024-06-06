@@ -1,4 +1,4 @@
-import { render } from './framework/render';
+import { render } from '../framework/render';
 import { getRandomArrayElement } from '../util';
 
 import EditPointView from '../view/edit-point-view';
@@ -8,44 +8,52 @@ import ListView from '../view/list-view';
 import CreateView from '../view/create-view';
 
 export default class Presenter {
+  #container;
+  #tripModel;
+  #sortView;
+  #listView;
+  #editView;
+  #createView;
+  #itemView;
+
   constructor({ container, tripModel }) {
-    this.container = container;
-    this.tripModel = tripModel;
+    this.#container = container;
+    this.#tripModel = tripModel;
   }
 
   renderSortView() {
-    this.sortView = new SortView();
-    render(this.sortView, this.container);
+    this.#sortView = new SortView();
+    render(this.#sortView, this.#container);
   }
 
   renderListView() {
-    this.ListView = new ListView();
-    render(this.ListView, this.container);
+    this.#listView = new ListView();
+    render(this.#listView, this.#container);
   }
 
   renderEditView(point, destinations, offers) {
-    this.EditView = new EditPointView(point, destinations, offers);
-    render(this.EditView, this.ListView.element);
+    this.#editView = new EditPointView(point, destinations, offers);
+    render(this.#editView, this.#listView.element);
   }
 
   renderCreateView() {
-    this.CreateView = new CreateView();
-    render(this.CreateView, this.ListView.element);
+    this.#createView = new CreateView();
+    render(this.#createView, this.#listView.element);
   }
 
   renderItemView(points, destination, offers) {
-    this.ItemView = new ItemView(points, destination, offers);
-    render(this.ItemView, this.ListView.element);
+    this.#itemView = new ItemView(points, destination, offers);
+    render(this.#itemView, this.#listView.element);
   }
 
   init() {
-    const points = this.tripModel.getPoints();
-    const destinations = this.tripModel.getDestinations();
-    const offers = this.tripModel.getOffers();
+    const points = this.#tripModel.getPoints();
+    const destinations = this.#tripModel.getDestinations();
+    const offers = this.#tripModel.getOffers();
 
-    const destination = this.tripModel.getDestinations();
+    const destination = this.#tripModel.getDestinations();
     const randomPoint = getRandomArrayElement(points);
-    const emptyPoint = this.tripModel.getEmptyPoint();
+    const emptyPoint = this.#tripModel.getEmptyPoint();
 
     this.renderSortView();
     this.renderListView();
@@ -53,14 +61,10 @@ export default class Presenter {
     this.renderEditView(emptyPoint, destinations, offers);
     // this.renderCreateView();
 
-
-    this.tripModel.getPoints().forEach((point) => {
-
-
+    this.#tripModel.getPoints().forEach((point) => {
       this.renderItemView(point, destination, offers);
     });
 
-    render(this.ListView, this.container);
+    render(this.#listView, this.#container);
   }
 }
-
