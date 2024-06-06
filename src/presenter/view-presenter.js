@@ -1,4 +1,4 @@
-import { render } from '../render';
+import { render } from './framework/render';
 import { getRandomArrayElement } from '../util';
 
 import EditPointView from '../view/edit-point-view';
@@ -25,17 +25,17 @@ export default class Presenter {
 
   renderEditView(point, destinations, offers) {
     this.EditView = new EditPointView(point, destinations, offers);
-    render(this.EditView, this.ListView.getElement());
+    render(this.EditView, this.ListView.element);
   }
 
   renderCreateView() {
     this.CreateView = new CreateView();
-    render(this.CreateView, this.ListView.getElement());
+    render(this.CreateView, this.ListView.element);
   }
 
   renderItemView(points, destination, offers) {
     this.ItemView = new ItemView(points, destination, offers);
-    render(this.ItemView, this.ListView.getElement());
+    render(this.ItemView, this.ListView.element);
   }
 
   init() {

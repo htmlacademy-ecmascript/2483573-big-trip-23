@@ -1,4 +1,4 @@
-import {createElement} from '../render';
+import {AbstractView} from '../framework/view/abstract-view';
 
 function createListViewTemplate() {
   return (
@@ -6,20 +6,10 @@ function createListViewTemplate() {
   );
 }
 
-export default class ListView {
-  getTemplate() {
+export default class ListView extends AbstractView {
+  get template() {
     return createListViewTemplate();
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
 
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
-  }
 }

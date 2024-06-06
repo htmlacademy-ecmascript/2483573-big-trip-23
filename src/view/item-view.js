@@ -1,4 +1,4 @@
-import {createElement} from '../render';
+import {AbstractView} from '../framework/view/abstract-view';
 
 function createOfferItem(offer) {
   return (
@@ -74,26 +74,17 @@ function createItemView(point, offers) {
   );
 }
 
-export default class ItemView {
+export default class ItemView extends AbstractView {
   constructor(point, destination, offers){
+    super();
     this.point = point;
     this.destination = destination;
     this.offers = offers;
   }
 
-  getTemplate() {
+  get template() {
     return createItemView(this.point, this.offers);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
 
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
-  }
 }
