@@ -75,16 +75,35 @@ function createItemView(point, offers) {
 }
 
 export default class ItemView extends AbstractView {
-  constructor(point, destination, offers){
+  #point = null;
+  #destinations = null;
+  #offers = null;
+  #clickHandler = null;
+  #rollupBtn = null;
+
+  constructor({point, destinations, offers , onEditClick}){
     super();
-    this.point = point;
-    this.destination = destination;
-    this.offers = offers;
+    this.#point = point;
+    this.#destinations = destinations;
+    this.#offers = offers;
+    this.#clickHandler = onEditClick;
+    this.#rollupBtn = this.element.querySelector('.event__rollup-btn');
+    this.#rollupBtn.addEventListener('click', this.#onClick);
+
+  }
+
+  removeElement(){
+    super.removeElement();
+    this.#rollupBtn.removeEventListener('click', this.#onClick);
   }
 
   get template() {
     return createItemView(this.point, this.offers);
   }
 
+  #onClick = (evt) => {
+    evt.preventDefaul();
+    this.#clickHandler();
+  };
 
 }

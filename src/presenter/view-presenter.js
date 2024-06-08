@@ -31,7 +31,7 @@ export default class Presenter {
     render(this.#listView, this.#container);
   }
 
-  #renderEditView(point, destinations, offers) {
+  #renderEditView({point, destinations, offers}) {
     this.#editView = new EditPointView({ point, destinations, offers });
     render(this.#editView, this.#listView.element);
   }
@@ -41,9 +41,7 @@ export default class Presenter {
     render(this.#createView, this.#listView.element);
   }
 
-  #renderItemView(point, destinations, offers) {
-    const itemComponent = new ItemView({ point, offers, destinations });
-    const editComponent = new EditPointView({ point, offers, destinations });
+  #renderItemView({point, destinations, offers}) {
 
     const escKeyDownHandler = (evt) => {
       if (evt.key === 'Escape') {
@@ -52,6 +50,23 @@ export default class Presenter {
         document.removeEventListener('keydown', escKeyDownHandler);
       }
     };
+    const onEditClick = () => switchToEditMode();
+    const onFormSubmit = () => switchToViewMode();
+    const onFormCancel = () => switchToViewMode();
+
+    const itemComponent = new ItemView(
+      { point,
+        offers,
+        destinations ,
+        onEditClick:onEditClick
+      });
+    const editComponent = new EditPointView(
+      { point,
+        offers,
+        destinations,
+        onFormSubmit:onFormSubmit,
+        onFormCancel:onFormCancel
+      });
 
     function switchToEditMode () {
       replace(editComponent, itemComponent);
@@ -63,19 +78,7 @@ export default class Presenter {
       document.removeEventListener('keydown', escKeyDownHandler);
     }
 
-    itemComponent.setEditClickHandler(() => {
-      switchToEditMode();
-    });
-
-    editComponent.setFormSubmitHandler(() => {
-      switchToViewMode();
-    });
-
-    editComponent.setFormCancelHandler(() => {
-      switchToViewMode();
-    });
-
-    render(itemComponent, this.#listView.element);
+    render(itemComponent, this.itemComponent.element);
   }
 
   init() {
@@ -94,7 +97,7 @@ export default class Presenter {
     this.#renderCreateView();
 
     points.forEach((point) => {
-      this.#renderItemView(point, destinations, offers);
+      this.#renderItemView({point, destinations, offers});
     });
 
     render(this.#listView, this.#container);
