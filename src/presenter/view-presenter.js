@@ -1,4 +1,4 @@
-import { render } from '../framework/render';
+import { render, replace, } from '../framework/render';
 import { getRandomArrayElement } from '../util';
 
 import EditPointView from '../view/edit-point-view';
@@ -21,29 +21,61 @@ export default class Presenter {
     this.#tripModel = tripModel;
   }
 
-  renderSortView() {
+  #renderSortView() {
     this.#sortView = new SortView();
     render(this.#sortView, this.#container);
   }
 
-  renderListView() {
+  #renderListView() {
     this.#listView = new ListView();
     render(this.#listView, this.#container);
   }
 
-  renderEditView(point, destinations, offers) {
-    this.#editView = new EditPointView(point, destinations, offers);
+  #renderEditView(point, destinations, offers) {
+    this.#editView = new EditPointView({ point, destinations, offers });
     render(this.#editView, this.#listView.element);
   }
 
-  renderCreateView() {
+  #renderCreateView() {
     this.#createView = new CreateView();
     render(this.#createView, this.#listView.element);
   }
 
-  renderItemView(points, destination, offers) {
-    this.#itemView = new ItemView(points, destination, offers);
-    render(this.#itemView, this.#listView.element);
+  #renderItemView(point, destinations, offers) {
+    const itemComponent = new ItemView({ point, offers, destinations });
+    const editComponent = new EditPointView({ point, offers, destinations });
+
+    const escKeyDownHandler = (evt) => {
+      if (evt.key === 'Escape') {
+        evt.preventDefault();
+        switchToViewMode();
+        document.removeEventListener('keydown', escKeyDownHandler);
+      }
+    };
+
+    function switchToEditMode () {
+      replace(editComponent, itemComponent);
+      document.addEventListener('keydown', escKeyDownHandler);
+    }
+
+    function switchToViewMode () {
+      replace(itemComponent, editComponent);
+      document.removeEventListener('keydown', escKeyDownHandler);
+    }
+
+    itemComponent.setEditClickHandler(() => {
+      switchToEditMode();
+    });
+
+    editComponent.setFormSubmitHandler(() => {
+      switchToViewMode();
+    });
+
+    editComponent.setFormCancelHandler(() => {
+      switchToViewMode();
+    });
+
+    render(itemComponent, this.#listView.element);
   }
 
   init() {
@@ -51,18 +83,18 @@ export default class Presenter {
     const destinations = this.#tripModel.getDestinations();
     const offers = this.#tripModel.getOffers();
 
-    const destination = this.#tripModel.getDestinations();
+    this.#renderSortView();
+    this.#renderListView();
+
     const randomPoint = getRandomArrayElement(points);
     const emptyPoint = this.#tripModel.getEmptyPoint();
 
-    this.renderSortView();
-    this.renderListView();
-    this.renderEditView(randomPoint, destinations, offers);
-    this.renderEditView(emptyPoint, destinations, offers);
-    // this.renderCreateView();
+    this.#renderEditView(randomPoint, destinations, offers);
+    this.#renderEditView(emptyPoint, destinations, offers);
+    this.#renderCreateView();
 
-    this.#tripModel.getPoints().forEach((point) => {
-      this.renderItemView(point, destination, offers);
+    points.forEach((point) => {
+      this.#renderItemView(point, destinations, offers);
     });
 
     render(this.#listView, this.#container);
