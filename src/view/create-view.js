@@ -1,4 +1,4 @@
-import {createElement} from '../render';
+import AbstractView from '../framework/view/abstract-view';
 
 function makeCreateViewTemplate() {
   return (
@@ -146,20 +146,10 @@ function makeCreateViewTemplate() {
   );
 }
 
-export default class CreateView {
-  getTemplate() {
+export default class CreateView extends AbstractView{
+  get template() {
     return makeCreateViewTemplate();
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
 
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
-  }
 }

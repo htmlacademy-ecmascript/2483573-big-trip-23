@@ -6,28 +6,28 @@ import { getOffer } from '../mock/offers-mock';
 const POINTS_COUNT = 5;
 
 export default class TripModel {
-  points = Array.from({length: POINTS_COUNT}, getRandomPoint);
-  destinations = getDestination;
-  offers = getOffer;
+  #points = Array.from({length: POINTS_COUNT}, getRandomPoint);
+  #destinations = getDestination;
+  #offers = getOffer;
 
   getPoints(){
-    return this.points;
+    return this.#points;
   }
 
   getDestinations(){
-    return this.destinations();
+    return this.#destinations();
   }
 
   getOffers() {
-    return this.offers();
+    return this.#offers();
   }
 
   getCurrentDestination(destinationID) {
-    return this.destinations.find((destination) => destination.id === destinationID);
+    return this.#destinations.find((destination) => destination.id === destinationID);
   }
 
   getPointOffers(offerType) {
-    return this.offers.find((offer) => offer.type === offerType);
+    return this.#offers.find((offer) => offer.type === offerType);
   }
 
   getEmptyPoint() {

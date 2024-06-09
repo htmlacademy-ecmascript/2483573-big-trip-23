@@ -1,4 +1,4 @@
-import { createElement } from '../render.js';
+import AbstractView from '../framework/view/abstract-view';
 
 function createEventTypeItem(offer, selectedOffer) {
   const isChecked = offer.type === selectedOffer;
@@ -37,11 +37,12 @@ function createOfferItem(offer, pointOffers) {
     `
   );
 }
-function createDestinationPicture (picture) {
+
+function createDestinationPicture(picture) {
   return `<img class="event__photo" src="${picture.src}" alt="${picture.description}"></img>`;
 }
-function createEditPointTemplate(point, destinations, offers) {
 
+function createEditPointTemplate({point, destinations, offers}) {
   const currentDestination = destinations.find((destination) => destination.id === point.destination) || destinations[0];
 
   const currentOffers = offers.find((offer) => offer.type === point.type);
@@ -127,26 +128,44 @@ function createEditPointTemplate(point, destinations, offers) {
   );
 }
 
-export default class EditPointView {
-  constructor(point, destinations, offers){
-    this.point = point;
-    this.destinations = destinations;
-    this.offers = offers;
-  }
+export default class EditPointView extends AbstractView{
+  #point = null;
+  #destinations = null;
+  #offers = null;
+  #submitHandler = null;
+  #cancelHandler = null;
 
-  getTemplate() {
-    return createEditPointTemplate(this.point, this.destinations, this.offers);
-  }
+  constructor({point, destinations, offers, onFormCancel, onFormSubmit}){
+    super();
+    this.#point = point;
+    this.#destinations = destinations;
+    this.#offers = offers;
+    this.#cancelHandler = onFormCancel;
+    this.#submitHandler = onFormSubmit;
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
+    this.element.addEventListener('submit', this.#onFormSubmit);
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#onCancelForm);
+    this.element.querySelector('.event__reset-btn').addEventListener('click', this.#onCancelForm);
   }
 
   removeElement() {
-    this.element = null;
+    super.removeElement();
+    this.element.removeEventListener('submit', this.#onFormSubmit);
+    this.element.querySelector('.event__rollup-btn').removeEventListener('click', this.#onCancelForm);
+    this.element.querySelector('.event__reset-btn').removeEventListener('click', this.#onCancelForm);
+  }
+
+  #onFormSubmit = (evt) => {
+    evt.preventDefault();
+    this.#submitHandler();
+  };
+
+  #onCancelForm = (evt) => {
+    evt.preventDefault();
+    this.#cancelHandler();
+  };
+
+  get template() {
+    return createEditPointTemplate({point: this.#point, destinations: this.#destinations, offers: this.#offers});
   }
 }

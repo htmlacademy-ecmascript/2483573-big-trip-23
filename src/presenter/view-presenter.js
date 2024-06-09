@@ -1,5 +1,4 @@
-import { render } from '../render';
-import { getRandomArrayElement } from '../util';
+import { render, replace } from '../framework/render';
 
 import EditPointView from '../view/edit-point-view';
 import SortView from '../view/list-sort-view';
@@ -8,59 +7,87 @@ import ListView from '../view/list-view';
 import CreateView from '../view/create-view';
 
 export default class Presenter {
+  #container;
+  #tripModel;
+  #sortView;
+  #listView;
+  #editView;
+  #createView;
+  #itemView;
+
   constructor({ container, tripModel }) {
-    this.container = container;
-    this.tripModel = tripModel;
+    this.#container = container;
+    this.#tripModel = tripModel;
   }
 
-  renderSortView() {
-    this.sortView = new SortView();
-    render(this.sortView, this.container);
+  #renderSortView() {
+    this.#sortView = new SortView();
+    render(this.#sortView, this.#container);
   }
 
-  renderListView() {
-    this.ListView = new ListView();
-    render(this.ListView, this.container);
+  #renderListView() {
+    this.#listView = new ListView();
+    render(this.#listView, this.#container);
   }
 
-  renderEditView(point, destinations, offers) {
-    this.EditView = new EditPointView(point, destinations, offers);
-    render(this.EditView, this.ListView.getElement());
+  #renderCreateView() {
+    this.#createView = new CreateView();
+    render(this.#createView, this.#listView.element);
   }
 
-  renderCreateView() {
-    this.CreateView = new CreateView();
-    render(this.CreateView, this.ListView.getElement());
-  }
+  #renderItemView({ point, destinations, offers }) {
+    const onEditClick = () => switchToEditMode();
+    const onFormSubmit = () => switchToViewMode();
+    const onFormCancel = () => switchToViewMode();
 
-  renderItemView(points, destination, offers) {
-    this.ItemView = new ItemView(points, destination, offers);
-    render(this.ItemView, this.ListView.getElement());
+    const itemComponent = new ItemView({
+      point,
+      offers,
+      destinations,
+      onEditClick,
+    });
+
+    const editComponent = new EditPointView({
+      point,
+      offers,
+      destinations,
+      onFormSubmit,
+      onFormCancel,
+    });
+
+    function switchToEditMode() {
+      replace(editComponent, itemComponent);
+      document.addEventListener('keydown', escKeyDownHandler);
+    }
+
+    function switchToViewMode() {
+      replace(itemComponent, editComponent);
+      document.removeEventListener('keydown', escKeyDownHandler);
+    }
+
+    function escKeyDownHandler(evt) {
+      if (evt.key === 'Escape') {
+        evt.preventDefault();
+        switchToViewMode();
+        document.removeEventListener('keydown', escKeyDownHandler);
+      }
+    }
+
+    render(itemComponent, this.#listView.element);
   }
 
   init() {
-    const points = this.tripModel.getPoints();
-    const destinations = this.tripModel.getDestinations();
-    const offers = this.tripModel.getOffers();
+    const points = this.#tripModel.getPoints();
+    const destinations = this.#tripModel.getDestinations();
+    const offers = this.#tripModel.getOffers();
 
-    const destination = this.tripModel.getDestinations();
-    const randomPoint = getRandomArrayElement(points);
-    const emptyPoint = this.tripModel.getEmptyPoint();
+    this.#renderSortView();
+    this.#renderListView();
 
-    this.renderSortView();
-    this.renderListView();
-    this.renderEditView(randomPoint, destinations, offers);
-    this.renderEditView(emptyPoint, destinations, offers);
-    // this.renderCreateView();
-
-
-    this.tripModel.getPoints().forEach((point) => {
-
-
-      this.renderItemView(point, destination, offers);
+    points.forEach((point) => {
+      this.#renderItemView({ point, destinations, offers });
     });
 
-    render(this.ListView, this.container);
+    render(this.#listView, this.#container);
   }
 }
-
