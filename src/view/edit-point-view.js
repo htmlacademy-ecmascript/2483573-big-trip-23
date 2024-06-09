@@ -37,9 +37,11 @@ function createOfferItem(offer, pointOffers) {
     `
   );
 }
-function createDestinationPicture (picture) {
+
+function createDestinationPicture(picture) {
   return `<img class="event__photo" src="${picture.src}" alt="${picture.description}"></img>`;
 }
+
 function createEditPointTemplate({point, destinations, offers}) {
   const currentDestination = destinations.find((destination) => destination.id === point.destination) || destinations[0];
 
@@ -132,7 +134,8 @@ export default class EditPointView extends AbstractView{
   #offers = null;
   #submitHandler = null;
   #cancelHandler = null;
-  constructor({point, destinations, offers, onFormCancel , onFormSubmit}){
+
+  constructor({point, destinations, offers, onFormCancel, onFormSubmit}){
     super();
     this.#point = point;
     this.#destinations = destinations;
@@ -142,15 +145,14 @@ export default class EditPointView extends AbstractView{
 
     this.element.addEventListener('submit', this.#onFormSubmit);
     this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#onCancelForm);
-    this.element.querySelector('.event__reser-btn').addEventListener('click', this.#onCancelForm);
-
+    this.element.querySelector('.event__reset-btn').addEventListener('click', this.#onCancelForm);
   }
 
   removeElement() {
     super.removeElement();
     this.element.removeEventListener('submit', this.#onFormSubmit);
     this.element.querySelector('.event__rollup-btn').removeEventListener('click', this.#onCancelForm);
-    this.element.querySelector('.event__reser-btn').removeEventListener('click', this.#onCancelForm);
+    this.element.querySelector('.event__reset-btn').removeEventListener('click', this.#onCancelForm);
   }
 
   #onFormSubmit = (evt) => {
@@ -164,8 +166,6 @@ export default class EditPointView extends AbstractView{
   };
 
   get template() {
-    return createEditPointTemplate(this.point, this.destinations, this.offers);
+    return createEditPointTemplate({point: this.#point, destinations: this.#destinations, offers: this.#offers});
   }
-
-
 }

@@ -1,5 +1,4 @@
-import { render, replace, } from '../framework/render';
-import { getRandomArrayElement } from '../util';
+import { render, replace } from '../framework/render';
 
 import EditPointView from '../view/edit-point-view';
 import SortView from '../view/list-sort-view';
@@ -31,54 +30,50 @@ export default class Presenter {
     render(this.#listView, this.#container);
   }
 
-  #renderEditView({point, destinations, offers}) {
-    this.#editView = new EditPointView({ point, destinations, offers });
-    render(this.#editView, this.#listView.element);
-  }
-
   #renderCreateView() {
     this.#createView = new CreateView();
     render(this.#createView, this.#listView.element);
   }
 
-  #renderItemView({point, destinations, offers}) {
+  #renderItemView({ point, destinations, offers }) {
+    const onEditClick = () => switchToEditMode();
+    const onFormSubmit = () => switchToViewMode();
+    const onFormCancel = () => switchToViewMode();
 
-    const escKeyDownHandler = (evt) => {
+    const itemComponent = new ItemView({
+      point,
+      offers,
+      destinations,
+      onEditClick,
+    });
+
+    const editComponent = new EditPointView({
+      point,
+      offers,
+      destinations,
+      onFormSubmit,
+      onFormCancel,
+    });
+
+    function switchToEditMode() {
+      replace(editComponent, itemComponent);
+      document.addEventListener('keydown', escKeyDownHandler);
+    }
+
+    function switchToViewMode() {
+      replace(itemComponent, editComponent);
+      document.removeEventListener('keydown', escKeyDownHandler);
+    }
+
+    function escKeyDownHandler(evt) {
       if (evt.key === 'Escape') {
         evt.preventDefault();
         switchToViewMode();
         document.removeEventListener('keydown', escKeyDownHandler);
       }
-    };
-    const onEditClick = () => switchToEditMode();
-    const onFormSubmit = () => switchToViewMode();
-    const onFormCancel = () => switchToViewMode();
-
-    const itemComponent = new ItemView(
-      { point,
-        offers,
-        destinations ,
-        onEditClick:onEditClick
-      });
-    const editComponent = new EditPointView(
-      { point,
-        offers,
-        destinations,
-        onFormSubmit:onFormSubmit,
-        onFormCancel:onFormCancel
-      });
-
-    function switchToEditMode () {
-      replace(editComponent, itemComponent);
-      document.addEventListener('keydown', escKeyDownHandler);
     }
 
-    function switchToViewMode () {
-      replace(itemComponent, editComponent);
-      document.removeEventListener('keydown', escKeyDownHandler);
-    }
-
-    render(itemComponent, this.itemComponent.element);
+    render(itemComponent, this.#listView.element);
   }
 
   init() {
@@ -89,15 +84,8 @@ export default class Presenter {
     this.#renderSortView();
     this.#renderListView();
 
-    const randomPoint = getRandomArrayElement(points);
-    const emptyPoint = this.#tripModel.getEmptyPoint();
-
-    this.#renderEditView(randomPoint, destinations, offers);
-    this.#renderEditView(emptyPoint, destinations, offers);
-    this.#renderCreateView();
-
     points.forEach((point) => {
-      this.#renderItemView({point, destinations, offers});
+      this.#renderItemView({ point, destinations, offers });
     });
 
     render(this.#listView, this.#container);
